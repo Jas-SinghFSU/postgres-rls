@@ -17,14 +17,15 @@ export async function queryWithTenant(tenantId: TenantId, sql: string, params: u
     console.log(`SQL Query: ${sql} PARAMS: ${JSON.stringify(params)}`);
 
     try {
-        await client.query('BEGIN');
+        await client.query(SQL_TRANSACTION.BEGIN);
 
         const sqlContext = setTenantId(tenantId, client)
+
         await client.query(sqlContext);
 
         const result = await client.query(sql, params);
 
-        await client.query('COMMIT');
+        await client.query(SQL_TRANSACTION.COMMIT);
 
         console.log(`\nQuery successful for tenant: ${tenantId ?? 'NONE'}. Rows: ${result.rowCount}\n`);
 
@@ -48,6 +49,11 @@ function setTenantId(tenantId: string | null, client: PoolClient): string {
 }
 
 type TenantId = string | null;
+
+enum SQL_TRANSACTION {
+    BEGIN = 'BEGIN',
+    COMMIT = 'COMMIT'
+};
 
 export interface Item extends QueryResultRow {
     id: number;

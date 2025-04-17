@@ -39,16 +39,11 @@ SELECT
 FROM generate_series(1, 1000) AS i,
 LATERAL (
     SELECT unnest(ARRAY[
-        'Google',
-        'Microsoft',
+        'Facebook',
         'Amazon',
         'Apple',
         'Netflix',
-        'Meta',
-        'Salesforce',
-        'Adobe',
-        'Oracle',
-        'IBM'
+        'Google',
     ]) AS tenant
 ) AS tenants;
 

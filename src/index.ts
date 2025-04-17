@@ -2,18 +2,18 @@ import { queryWithTenant, Item } from './db';
 import chalk from 'chalk';
 import util from 'util';
 
-const tenantA_Id = 'Google';
-const tenantB_Id = 'Amazon';
+const tenantGoogle = 'Google';
+const tenantAmazon = 'Amazon';
 
 async function main() {
     await runTest('Get everything for Tenant A as Tenant A', async () => {
-        const result = await queryWithTenant(tenantA_Id, 'SELECT * FROM items', []);
-        assertResultCountAndTenantMatch('Get everything for Tenant A as Tenant A', result.rows, 1000, tenantA_Id);
+        const result = await queryWithTenant(tenantGoogle, 'SELECT * FROM items', []);
+        assertResultCountAndTenantMatch('Get everything for Tenant A as Tenant A', result.rows, 1000, tenantGoogle);
     });
 
     await runTest('Get everything for Tenant B as Tenant B', async () => {
-        const result = await queryWithTenant(tenantB_Id, 'SELECT * FROM items', []);
-        assertResultCountAndTenantMatch('Get everything for Tenant B as Tenant B', result.rows, 1000, tenantB_Id);
+        const result = await queryWithTenant(tenantAmazon, 'SELECT * FROM items', []);
+        assertResultCountAndTenantMatch('Get everything for Tenant B as Tenant B', result.rows, 1000, tenantAmazon);
     });
 
     await runTest("Don't pass tenantId and get 0 results back in return", async () => {
@@ -28,7 +28,7 @@ async function main() {
     });
 
     await runTest('Try to access Tenant A data as Tenant B (rude)', async () => {
-        const result = await queryWithTenant(tenantB_Id, 'SELECT * FROM items WHERE id = $1', [1]);
+        const result = await queryWithTenant(tenantAmazon, 'SELECT * FROM items WHERE id = $1', [1]);
         if (result.rowCount === 0) {
             logStatus('Try to access Tenant A data as Tenant B (rude)', true, `Returned 0 rows as expected.`);
         } else {

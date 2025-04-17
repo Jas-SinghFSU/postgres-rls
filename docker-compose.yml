@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres_rls
+    restart: always
+    environment:
+      POSTGRES_DB: gobirds
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - rls_network
+
+  pgbouncer:
+    build: ./pgbouncer
+    container_name: pgbouncer_rls
+    restart: always
+    ports:
+      - "6432:6432"
+    volumes:
+      - ./pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+      - ./pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
+    depends_on:
+      - postgres
+    command: pgbouncer /etc/pgbouncer/pgbouncer.ini
+    networks:
+      - rls_network
+
+  adminer:
+      image: adminer
+      restart: always
+      ports:
+          - 8081:8080
+      networks:
+            - rls_network
+
+networks:
+  rls_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
